@@ -36,9 +36,11 @@ st.markdown("""
 
 # Load dataset
 df = pd.read_csv("HR_comma_sep (2).csv")
+st.write("### Dataset Preview")
+st.dataframe(df.head())
 
 # First few rows
-df.head()
+# df.head()
 
 # Average values grouped by employee retention
 df.groupby('left').mean(numeric_only=True)
