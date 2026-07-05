@@ -8,10 +8,10 @@ Original file is located at
 """
 import streamlit as st
 import pandas as pd
-
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
+import matplotlib.pyplot as plt
 # Page Configuration
 
 st.set_page_config(
@@ -63,9 +63,9 @@ plt.title("Department vs Employee Retention")
 plt.show()
 
 
-# from sklearn.model_selection import train_test_split
-# from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import LabelEncoder
+ from sklearn.model_selection import train_test_split
+ from sklearn.linear_model import LogisticRegression
+ from sklearn.preprocessing import LabelEncoder
 
 # Selecting important features
 X = df[['satisfaction_level',
