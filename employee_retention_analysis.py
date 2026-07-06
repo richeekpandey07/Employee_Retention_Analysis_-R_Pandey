@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 
-# 1. This MUST be the absolute first Streamlit command
+# 1. Page Configuration (Must be the very first Streamlit command)
 st.set_page_config(
     page_title="Employee Retention Analysis",
     page_icon="🤝",
     layout="centered"
 )
 
-# Title & Info
+# 2. UI Titles & Info
 st.title("Employee Retention Analysis")
 st.write("Predicting employee turnover using Logistic Regression.")
 
@@ -26,40 +25,36 @@ st.markdown("""
 💻 **GitHub:** [Repository](https://github.com/richeekpandey07)
 """)
 
-# Load dataset safely
+# 3. Load dataset safely
 try:
     df = pd.read_csv("HR_comma_sep (2).csv")
 except FileNotFoundError:
-    st.error("❌ Error: 'HR_comma_sep (2).csv' not found. Please place the file in the same directory.")
+    st.error("❌ Error: 'HR_comma_sep (2).csv' not found. Please place the data file in the same directory as this script.")
     st.stop()
 
 # --- DATA EXPLORATION ---
 st.header("📊 Data Exploration")
 
 if st.checkbox("Show Raw Data"):
+    st.subheader("First few rows of the dataset")
     st.dataframe(df.head())
 
 if st.checkbox("Show Mean Values Grouped by Retention"):
+    st.subheader("Average metrics for employees who stayed (0) vs left (1)")
     st.dataframe(df.groupby('left').mean(numeric_only=True))
 
-# --- VISUALIZATIONS ---
+# --- VISUALIZATIONS (Using Streamlit's Native Charts to avoid Matplotlib Errors) ---
 st.header("📈 Data Visualizations")
 
 # Chart 1: Salary vs Retention
 st.subheader("Salary vs Employee Retention")
-fig1, ax1 = plt.subplots()
-pd.crosstab(df.salary, df.left).plot(kind='bar', ax=ax1)
-ax1.set_xlabel("Salary")
-ax1.set_ylabel("Number of Employees")
-st.pyplot(fig1)
+salary_crosstab = pd.crosstab(df['salary'], df['left'])
+st.bar_chart(salary_crosstab)
 
 # Chart 2: Department vs Retention
 st.subheader("Department vs Employee Retention")
-fig2, ax2 = plt.subplots(figsize=(10, 5))
-pd.crosstab(df.Department, df.left).plot(kind='bar', ax=ax2)
-ax2.set_xlabel("Department")
-ax2.set_ylabel("Number of Employees")
-st.pyplot(fig2)
+dept_crosstab = pd.crosstab(df['Department'], df['left'])
+st.bar_chart(dept_crosstab)
 
 # --- MODEL TRAINING ---
 X = df[['satisfaction_level', 'average_montly_hours', 'promotion_last_5years', 'salary']].copy()
@@ -85,6 +80,7 @@ st.sidebar.metric(label="Model Accuracy", value=f"{accuracy:.2%}")
 # --- INTERACTIVE PREDICTION ---
 st.markdown("---")
 st.header("🔮 Predict Employee Retention")
+st.write("Input the employee's details below to predict turnover risk:")
 
 satisfaction = st.slider("Satisfaction Level", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
 hours = st.number_input("Average Monthly Hours", min_value=10.0, max_value=400.0, value=200.0, step=1.0)
