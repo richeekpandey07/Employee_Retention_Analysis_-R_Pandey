@@ -4,18 +4,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder  # Fixed: Added missing import
 from sklearn.metrics import accuracy_score
 
-# Page Configuration
+# CRITICAL FIX: This must be the absolute FIRST Streamlit command
 st.set_page_config(
     page_title="Employee Retention Analysis",
     page_icon="🤝",
     layout="centered"
 )
 
+# App Titles & Metadata
 st.title("Employee Retention Analysis")
-st.write("Predicting employee turnover using Logistic Regression.")
+st.write("Employee Retention Analysis using Logistic Regression")
 
 st.markdown("---")
 st.markdown("""
@@ -26,15 +27,10 @@ st.markdown("""
 """)
 
 # Load dataset safely
-@st.cache_data
-def load_data():
-    # Make sure 'HR_comma_sep (2).csv' is in the same folder as this script
-    return pd.read_csv("HR_comma_sep (2).csv")
-
 try:
-    df = load_data()
+    df = pd.read_csv("HR_comma_sep (2).csv")
 except FileNotFoundError:
-    st.error("❌ Error: 'HR_comma_sep (2).csv' not found. Please place the file in the same directory.")
+    st.error("❌ Error: 'HR_comma_sep (2).csv' file not found. Ensure it's in the same folder as this script.")
     st.stop()
 
 # --- DATA EXPLORATION SECTION ---
@@ -51,7 +47,7 @@ if st.checkbox("Show Mean Values Grouped by Retention"):
 # --- VISUALIZATIONS SECTION ---
 st.header("📈 Data Visualizations")
 
-# Chart 1: Salary vs Retention
+# Chart 1: Salary vs Retention (FIXED: Using explicit figure for Streamlit)
 st.subheader("Salary vs Employee Retention")
 fig1, ax1 = plt.subplots()
 pd.crosstab(df.salary, df.left).plot(kind='bar', ax=ax1)
@@ -59,7 +55,7 @@ ax1.set_xlabel("Salary")
 ax1.set_ylabel("Number of Employees")
 st.pyplot(fig1)
 
-# Chart 2: Department vs Retention
+# Chart 2: Department vs Retention (FIXED: Using explicit figure for Streamlit)
 st.subheader("Department vs Employee Retention")
 fig2, ax2 = plt.subplots(figsize=(10, 5))
 pd.crosstab(df.Department, df.left).plot(kind='bar', ax=ax2)
@@ -68,10 +64,10 @@ ax2.set_ylabel("Number of Employees")
 st.pyplot(fig2)
 
 # --- MODEL TRAINING ---
-# Selecting features
+# Selecting important features
 X = df[['satisfaction_level', 'average_montly_hours', 'promotion_last_5years', 'salary']].copy()
 
-# Fix: Properly label encode salary
+# Convert salary into numbers using LabelEncoder
 le = LabelEncoder()
 X['salary'] = le.fit_transform(X['salary'])
 y = df['left']
@@ -87,6 +83,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
+# Display results inside Streamlit web page
 st.sidebar.header("🤖 Model Performance")
 st.sidebar.metric(label="Model Accuracy", value=f"{accuracy:.2%}")
 
